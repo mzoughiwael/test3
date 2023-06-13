@@ -20,7 +20,7 @@ jobs:
       with:
         host: ${{ secrets.VM_HOST }}
         username: ${{ secrets.VM_USERNAME }}
-        
+        password: ${{ secrets.INPUT_PASSWORD }}
         script: |
         
           https://github.com/mzoughiwael/test3/blob/main/setup_dolibarr.sh.txt
