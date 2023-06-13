@@ -18,11 +18,9 @@ jobs:
     - name: Execute Shell Script on Azure VM
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.VM_HOST }}  
-        username: ${{ secrets.VM_USERNAME }}  # Nom d'utilisateur pour se connecter à la machine virtuelle
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}  # Clé privée SSH pour l'authentification
         script: |
-          # Commandes à exécuter sur la machine virtuelle
-          echo "Hello from Azure VM!"
-          echo "Running script on Azure VM..."
-          ./path/to/your/script.sh  # Chemin vers votre script shell
+        
+          https://github.com/mzoughiwael/test3/blob/main/setup_dolibarr.sh.txt
