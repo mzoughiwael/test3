@@ -1,0 +1,28 @@
+# This is a basic workflow to help you get started with Actions
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install SSH client
+      run: sudo apt-get install openssh-client -y
+
+    - name: Execute Shell Script on Azure VM
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VM_HOST }}  
+        username: ${{ secrets.VM_USERNAME }}  # Nom d'utilisateur pour se connecter à la machine virtuelle
+        key: ${{ secrets.SSH_PRIVATE_KEY }}  # Clé privée SSH pour l'authentification
+        script: |
+          # Commandes à exécuter sur la machine virtuelle
+          echo "Hello from Azure VM!"
+          echo "Running script on Azure VM..."
+          ./path/to/your/script.sh  # Chemin vers votre script shell
