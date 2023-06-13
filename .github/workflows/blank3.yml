@@ -24,4 +24,4 @@ jobs:
         password: ${{ secrets.INPUT_PASSWORD }}
         script: |
         
-          nano setup_dolibarr.sh
+          vim setup_dolibarr.sh
