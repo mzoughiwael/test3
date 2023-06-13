@@ -24,4 +24,4 @@ jobs:
         password: ${{ secrets.INPUT_PASSWORD }}
         script: |
         
-          vim setup_dolibarr.sh
+          sshpass -p ${{ secrets.INPUT_PASSWORD }} ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} 'vim setup_dolibarr.sh'
