@@ -43,6 +43,6 @@ jobs:
             password: ${{ secrets.INPUT_PASSWORD }}
             key: ${{ secrets.SSH_PRIVATE_KEY }}
             script: |
-                sudo apt-get update
+                
                 sshpass -p ${{ secrets.INPUT_PASSWORD }} ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} 
                  vim setup_dolibarr.sh
