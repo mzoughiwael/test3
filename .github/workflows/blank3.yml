@@ -45,7 +45,7 @@ jobs:
             host: ${{ secrets.VM_HOST }}
             username: ${{ secrets.VM_USERNAME }}
             password: ${{ secrets.INPUT_PASSWORD }}
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
+           
             script: |
         
                 sshpass -p ${{ secrets.INPUT_PASSWORD }} ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} 
