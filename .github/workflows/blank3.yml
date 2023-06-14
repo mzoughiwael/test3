@@ -6,19 +6,27 @@ on:
 
 
 
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Execute Shell Script on Azure VM
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            vim setup_dolibarr.sh
+    - name: Install SSH client
+      run: sudo apt-get install openssh-client -y
+
+   
+    - name: Execute Shell Script on Azure VM
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USERNAME }}
+        password: ${{ secrets.INPUT_PASSWORD }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+        
+          sshpass -p ${{ secrets.INPUT_PASSWORD }} ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} 
+          vim setup_dolibarr.sh
