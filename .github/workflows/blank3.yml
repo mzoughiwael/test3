@@ -31,13 +31,10 @@ jobs:
       if: runner.os == 'Linux' 
    
     - name: Update System Packages
-      uses: appleboy/privileged-docker-action@master
-      with:
-       image: ubuntu
-       entrypoint: bash
-       script: |
-          apt-get update
-      if: runner.os == 'Linux'
+      run: |
+       sudo apt-get update
+       container:
+       image: docker:latest
     - name: Execute Shell Script on Azure VM
       uses: appleboy/ssh-action@master
       with:
