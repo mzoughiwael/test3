@@ -17,16 +17,22 @@ jobs:
 
     - name: Install SSH client
       run: sudo apt-get install openssh-client -y
-
+   
+    - name: Install sshpass
+      run: |
+       apt-get update
+       apt-get install -y sshpass
+      if: runner.os == 'Linux' 
+   
    
     - name: Execute Shell Script on Azure VM
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.VM_HOST }}
-        username: ${{ secrets.VM_USERNAME }}
-        password: ${{ secrets.INPUT_PASSWORD }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
+            host: ${{ secrets.VM_HOST }}
+            username: ${{ secrets.VM_USERNAME }}
+            password: ${{ secrets.INPUT_PASSWORD }}
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            script: |
         
-          sshpass -p ${{ secrets.INPUT_PASSWORD }} ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} 
-          vim setup_dolibarr.sh
+                sshpass -p ${{ secrets.INPUT_PASSWORD }} ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} 
+                 vim setup_dolibarr.sh
