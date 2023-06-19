@@ -1,48 +1,27 @@
-# This is a basic workflow to help you get started with Actions
+name: Install Apache on Azure VM
 on:
   push:
     branches:
       - main
-
-
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Install SSH client
-      run: sudo apt-get install openssh-client -y
- 
-    - name: Update System Packages
-      uses: actions/setup-python@v2
-      with:
-       python-version: '3.x'
-      if: runner.os == 'Linux'
-   
-   
-    - name: Install sshpass
-      run: |
-       apt-get update
-       apt-get install -y sshpass
-      if: runner.os == 'Linux' 
-   
-    - name: Update System Packages
-      run: |
-       sudo apt-get update
-       container:
-       image: docker:latest
-    - name: Execute Shell Script on Azure VM
-      uses: appleboy/ssh-action@master
-      with:
-            host: ${{ secrets.VM_HOST }}
-            username: ${{ secrets.VM_USERNAME }}
-            password: ${{ secrets.INPUT_PASSWORD }}
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
-            script: |
-                
-                sshpass -p ${{ secrets.INPUT_PASSWORD }} ssh ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} 
-                 vim setup_dolibarr.sh
+      - name: Set up Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install Apache
+        run: |
+          az vm run-command invoke \
+            --resource-group waelaz900 \
+            --name waelTestVm \
+            --command-id RunShellScript \
+            --scripts "sudo apt-get update && sudo apt-get install -y apache2"
