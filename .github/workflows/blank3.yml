@@ -72,31 +72,31 @@ jobs:
           </VirtualHost>
           EOT
 
-        # Generate a self-signed SSL certificate
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/certs/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+          # Generate a self-signed SSL certificate
+           openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/certs/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
 
-        # Install PHP and required modules
-        apt-get install php php-cli php-mysql php-common php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap libapache2-mod-php -y
+          # Install PHP and required modules
+          apt-get install php php-cli php-mysql php-common php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap libapache2-mod-php -y
 
-        # Test Apache configuration
-        apachectl configtest
+          # Test Apache configuration
+          apachectl configtest
 
-        # Enable Dolibarr site and disable the default site
-        a2ensite dolibarr
-        a2dissite 000-default.conf
+          # Enable Dolibarr site and disable the default site
+          a2ensite dolibarr
+          a2dissite 000-default.conf
 
-        # Enable Apache rewrite module
-        a2enmod rewrite
+          # Enable Apache rewrite module
+          a2enmod rewrite
 
-        # Create Dolibarr directories and set permissions
-        mkdir /srv/dolibarr
-        mkdir /var/www/html/dolibarr
-        chown -R www-data:www-data /var/www/html/dolibarr
-        chown -R www-data:www-data /var/www/html
+          # Create Dolibarr directories and set permissions
+          mkdir /srv/dolibarr
+          mkdir /var/www/html/dolibarr
+          chown -R www-data:www-data /var/www/html/dolibarr
+          chown -R www-data:www-data /var/www/html
 
-        # Restart Apache
-        systemctl restart apache2
+          # Restart Apache
+          systemctl restart apache2
 
-        # Check UFW status
-        ufw status
-        EOF
+           # Check UFW status
+          ufw status
+          EOF
