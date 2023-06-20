@@ -26,7 +26,7 @@ jobs:
 
       - name: Run Dolibarr installation script
         run: |
-          ssh wael@74.235.37.64 'bash -s' << EOF
+          ssh waelUserName@74.235.37.64 'bash -s' << EOF
            # Update and upgrade system packages
            apt update
           apt upgrade -y
