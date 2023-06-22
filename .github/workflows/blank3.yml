@@ -26,9 +26,10 @@ jobs:
 
       - name: Run Dolibarr installation script
         run: |
-          ssh waelUserName@74.235.37.64 'bash -s' << EOF
-           # Update and upgrade system packages
-           apt update
+          #!/bin/bash
+
+          # Update and upgrade system packages
+          apt update
           apt upgrade -y
 
           # Install Apache
@@ -50,53 +51,26 @@ jobs:
           # Restart Apache
           systemctl restart apache2
 
-          # Create a new Apache configuration file
-          cat > /etc/apache2/sites-available/dolibarr.conf << EOT
-          <VirtualHost *:80>
-            ServerName crm
-            Redirect / https://74.235.37.64//
-          </VirtualHost>
-          <VirtualHost *:443>
-            ServerName crm
-            DocumentRoot /var/www/html/dolibarr/
-
-            <Directory /srv/dolibarr>
-                Options +FollowSymlinks
-                AllowOverride All
-                Require all granted
-            </Directory>
-
-            SSLEngine on
-            SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
-            SSLCertificateKeyFile /etc/ssl/certs/apache-selfsigned.key
-          </VirtualHost>
-          EOT
-
-          # Generate a self-signed SSL certificate
-           openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/certs/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
-
           # Install PHP and required modules
-          apt-get install php php-cli php-mysql php-common php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap libapache2-mod-php -y
+          apt install php php-cli php-mysql php-common php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap libapache2-mod-php -y
 
-          # Test Apache configuration
-          apachectl configtest
+          # Download Dolibarr
+          wget https://www.dolibarr.org/files/stable/14.0.3/dolibarr-14.0.3.tgz
 
-          # Enable Dolibarr site and disable the default site
-          a2ensite dolibarr
-          a2dissite 000-default.conf
+          # Extract Dolibarr archive
+          tar xzf dolibarr-14.0.3.tgz
 
-          # Enable Apache rewrite module
-          a2enmod rewrite
+          # Move Dolibarr files to web directory
+          mv dolibarr-14.0.3 /var/www/html/dolibarr
 
-          # Create Dolibarr directories and set permissions
-          mkdir /srv/dolibarr
-          mkdir /var/www/html/dolibarr
+          # Set permissions
           chown -R www-data:www-data /var/www/html/dolibarr
-          chown -R www-data:www-data /var/www/html
+          chmod -R 755 /var/www/html/dolibarr/documents/
+
+          # Create Dolibarr database
+          mysql -u root -p -e "CREATE DATABASE test;"
+          mysql -u root -p -e "GRANT ALL PRIVILEGES ON test.* TO 'wael'@'localhost' IDENTIFIED BY 'Mzoughi@2023';"
+          mysql -u root -p -e "FLUSH PRIVILEGES;"
 
           # Restart Apache
           systemctl restart apache2
-
-           # Check UFW status
-          ufw status
-          EOF
