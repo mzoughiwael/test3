@@ -93,13 +93,13 @@ jobs:
           mv dolibarr-14.0.3 /var/www/html/dolibarr
 
           # Set permissions
-          chown -R www-data:www-data /var/www/html/dolibarr
-          chmod -R 755 /var/www/html/dolibarr/documents/
+          sudo chown -R www-data:www-data /var/www/html/dolibarr
+          sudo chmod -R 755 /var/www/html/dolibarr/documents/
 
           # Create Dolibarr database
-          mysql -u root -p -e "CREATE DATABASE test;"
-          mysql -u root -p -e "GRANT ALL PRIVILEGES ON test.* TO 'wael'@'localhost' IDENTIFIED BY 'Mzoughi@2023';"
-          mysql -u root -p -e "FLUSH PRIVILEGES;"
+          sudo mysql -u root -p -e "CREATE DATABASE test;"
+          sudo mysql -u root -p -e "GRANT ALL PRIVILEGES ON test.* TO 'wael'@'localhost' IDENTIFIED BY 'Mzoughi@2023';"
+          sudo mysql -u root -p -e "FLUSH PRIVILEGES;"
 
           # Restart Apache
-          systemctl restart apache2
+          sudo systemctl restart apache2
