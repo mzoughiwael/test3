@@ -29,30 +29,55 @@ jobs:
           #!/bin/bash
 
           # Update and upgrade system packages
-          apt update
-          apt upgrade -y
+          sudo apt update
+          sudo apt upgrade -y
 
           # Install Apache
-          apt install apache2 -y
+          sudo apt install apache2 -y
 
           # Start and enable Apache service
-          systemctl start apache2
-          systemctl enable apache2
+          sudo systemctl start apache2
+          sudo systemctl enable apache2
 
           # Allow HTTP, HTTPS, and SSH through UFW
-          ufw allow http
-          ufw allow https
-          ufw allow ssh
-          ufw --force enable
+          sudo ufw allow http
+          sudo ufw allow https
+          sudo ufw allow ssh
+          sudo ufw --force enable
 
           # Enable SSL module for Apache
-          a2enmod ssl
+          sudo a2enmod ssl
 
           # Restart Apache
-          systemctl restart apache2
+          sudo systemctl restart apache2
+          
+          # Configure Apache Virtual Host for Dolibarr
+          sudo tee /etc/apache2/sites-available/dolibarr.conf > /dev/null <<EOT
+          <VirtualHost *:80>
+          ServerName crm
+          Redirect / https://74.235.37.64/
+          </VirtualHost>
 
+          <VirtualHost *:443>
+          ServerName crm
+          DocumentRoot /var/www/html/dolibarr/
+
+          <Directory /var/www/html/dolibarr>
+          Options +FollowSymlinks
+          AllowOverride All
+          Require all granted
+          </Directory>
+
+          SSLEngine on
+          SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
+          SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+          </VirtualHost>
+          EOT
+          # Generate a self-signed SSL certificate
+          sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+          
           # Install PHP and required modules
-          apt install php php-cli php-mysql php-common php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap libapache2-mod-php -y
+          sudo apt install php php-cli php-mysql php-common php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap libapache2-mod-php -y
 
           # Download Dolibarr
           wget https://www.dolibarr.org/files/stable/14.0.3/dolibarr-14.0.3.tgz
