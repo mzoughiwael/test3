@@ -27,7 +27,11 @@ jobs:
       - name: Run Dolibarr installation script
         run: |
           #!/bin/bash
-
+         
+          # Lock APT
+          sudo rm -f /var/lib/apt/lists/lock
+          sudo rm -f /var/cache/apt/archives/lock
+          
           # Update and upgrade system packages
           sudo apt update
           sudo apt upgrade -y
