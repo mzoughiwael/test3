@@ -59,7 +59,7 @@ jobs:
           sudo tee /etc/apache2/sites-available/dolibarr.conf > /dev/null <<EOT
           <VirtualHost *:80>
           ServerName crm
-          Redirect / https://74.235.37.64/
+          Redirect / https://52.150.21.112/
           </VirtualHost>
 
           <VirtualHost *:443>
