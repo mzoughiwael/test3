@@ -24,81 +24,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Run Dolibarr installation script
+      - name: Install Apache
         run: |
-          #!/bin/bash
-         
-          # Lock APT
-          sudo rm -f /var/lib/apt/lists/lock
-          sudo rm -f /var/cache/apt/archives/lock
-          
-          # Update and upgrade system packages
-          sudo apt-get update
-          sudo apt-get upgrade -y
-
-          # Install Apache
-          sudo apt install apache2 -y
-
-          # Start and enable Apache service
-          sudo systemctl start apache2
-          sudo systemctl enable apache2
-
-          # Allow HTTP, HTTPS, and SSH through UFW
-          sudo ufw allow http
-          sudo ufw allow https
-          sudo ufw allow ssh
-          sudo ufw --force enable
-
-          # Enable SSL module for Apache
-          sudo a2enmod ssl
-
-          # Restart Apache
-          sudo systemctl restart apache2
-          
-          # Configure Apache Virtual Host for Dolibarr
-          sudo tee /etc/apache2/sites-available/dolibarr.conf > /dev/null <<EOT
-          <VirtualHost *:80>
-          ServerName crm
-          Redirect / https://52.150.21.112/
-          </VirtualHost>
-
-          <VirtualHost *:443>
-          ServerName crm
-          DocumentRoot /var/www/html/dolibarr/
-
-          <Directory /var/www/html/dolibarr>
-          Options +FollowSymlinks
-          AllowOverride All
-          Require all granted
-          </Directory>
- 
-          SSLEngine on
-          SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
-          SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
-          </VirtualHost>
-          EOT
-          # Generate a self-signed SSL certificate
-          sudo openssl req -new -key /usr/bin/openssl -out /etc/ssl/certs -subj "/C=US/ST=California/L=San Francisco/O=IntechGeeks/CN=intechgeeks.com"
-          
-          # Install PHP and required modules
-          sudo apt install php php-cli php-mysql php-common php-zip php-mbstring php-xmlrpc php-curl php-soap php-gd php-xml php-intl php-ldap libapache2-mod-php -y
-
-          # Download Dolibarr
-          wget https://www.dolibarr.org/files/stable/14.0.3/dolibarr-14.0.3.tgz
-
-          # Extract Dolibarr archive
-          tar xzf dolibarr-14.0.3.tgz
-
-          # Move Dolibarr files to web directory
-          mv dolibarr-14.0.3 /var/www/html/dolibarr
-
-          # Set permissions
-          sudo chown -R www-data:www-data /var/www/html/dolibarr
-          sudo chmod -R 755 /var/www/html/dolibarr/documents/
-
-          # Create Dolibarr database
-          sudo mysql -u root -p -e "CREATE DATABASE test;"
-          sudo mysql -u root -p -e "GRANT ALL PRIVILEGES ON test.* TO 'wael'@'localhost' IDENTIFIED BY 'Mzoughi@2023';"
-
-          # Restart Apache
-          sudo systemctl restart apache2
+          az vm run-command invoke \
+            --resource-group waelaz900 \
+            --name waelTestVm \
+            --command-id RunShellScript \
+            --scripts "sudo apt-get update && sudo apt-get install -y apache2"
