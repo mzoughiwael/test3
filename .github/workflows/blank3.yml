@@ -1,42 +1,86 @@
-name: Install Apache on Azure VM
+# This is a basic workflow that is manually triggered
+env:
+  padressPublic: ''
+  puserName: ''
+ 
+
+ 
+name: Azure Deployment
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
 on:
   push:
+    # Inputs the workflow accepts.
     branches:
       - main
-  workflow_dispatch:
-
-
-
-
+ 
+ 
+ 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+
   deploy:
     runs-on: ubuntu-latest
 
+  # This workflow contains a single job called "greet"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-       
+
       - name: Install Azure CLI
         run: |
-              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-              az --version
-               
-      - name: Set up Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          az upgrade
+          az version
+          
+      - name: Azure Login
+        run: az login --service-principal --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}      
+      
+      
+      
+      - name: Deploy 
+        run: az account list --output table
+        
 
-      - name: Install Apache
+      
+      - name: Create gr
+        run: az deployment sub create --subscription "TMT-NON-PROD-PLATFORM-01" --location eastus --template-file ResourceGroup.bicep
+        
+      - name: Create kV
+        run: az deployment group create --resource-group pfeIacRg1 --template-file Keyvault.bicep  --parameters secretValue=${{ secrets.SSH_PASSWORD }}      
+
+      - name: Create machineV
+        run: az deployment group create --resource-group pfeIacRg1 --template-file main.bicep        
+      
+
+      - name: Get VM IP address
+      
         run: |
-          az vm run-command invoke \
-            --resource-group waelaz900 \
-            --name waelTestVm \
-            --command-id RunShellScript \
-            --scripts "sudo apt-get update && sudo apt-get install -y apache2"
-      - name: Install Dolibarr
+          az vm list-ip-addresses --resource-group pfeIacRg1 --name chabbouhTestVm
+          avminfo=$(az vm list-ip-addresses --resource-group pfeIacRg1 --name chabbouhTestVm --query "[0].virtualMachine.network.publicIpAddresses[0].ipAddress" --output tsv)
+          echo "VM IP address: $avminfo"
+          username=$(az vm show --resource-group pfeIacRg1 --name chabbouhTestVm --query 'osProfile.adminUsername' --output tsv)
+          echo "VM username: $username"
+          echo "padressPublic=$avminfo" >> $GITHUB_ENV
+          echo "puserName=$username" >> $GITHUB_ENV
+        
+        
+      - name: Open ports on VM
         run: |
-          az vm run-command invoke \
-            --resource-group waelaz900 \
-            --name waelTestVm \
-            --command-id RunShellScript \
-            --scripts "sudo apt-get install -y php libapache2-mod-php php-mysql php-curl php-gd php-intl php-ldap php-mbstring php-xml php-zip && sudo wget https://download.dolibarr.org/download/stable/$(wget -qO- https://download.dolibarr.org/latest-stable.txt) -O dolibarr.zip && sudo unzip dolibarr.zip -d /var/www/html/ && sudo chown -R www-data:www-data /var/www/html/dolibarr/"
+          az network nsg rule create --resource-group pfeIacRg1 --nsg-name chabbouhNSG --name SSH --protocol Tcp --direction Inbound --priority 100 --destination-port-ranges 22
+          az network nsg rule create --resource-group pfeIacRg1 --nsg-name chabbouhNSG --name HTTP --protocol Tcp --direction Inbound --priority 101 --destination-port-ranges 80
+          az network nsg rule create --resource-group pfeIacRg1 --nsg-name chabbouhNSG --name HTTPS --protocol Tcp --direction Inbound --priority 102 --destination-port-ranges 443
+ 
+
+      - name: SSH to VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.padressPublic }}
+          username: ${{ env.puserName }} 
+          password: ${{ secrets.SSH_PASSWORD }} 
+          timeout: 300s
+          script: |
+            echo "Connected to Azure VM"
+            echo "VM username: ${{ env.padressPublic }}"
+            
+          
