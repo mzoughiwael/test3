@@ -7,17 +7,17 @@ param plocation string
 
 
 
-param vnetName string = 'chabbouhTestVnet'
+param vnetName string = 'waelTestVnet'
 
-param subnetName string = 'chabbouhTestSubnet'
+param subnetName string = 'waelTestSubnet'
 
-param vmName string = 'chabbouhTestVm'
+param vmName string = 'waelTestVm'
 
 
 
 param diskSizeGb int = 128
 
-param nsgName string = 'chabbouhNSG'
+param nsgName string = 'waelNSG'
 
 param padminUsername string 
 
