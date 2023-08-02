@@ -4,6 +4,7 @@ param padminUsername string = 'chabbouh'
 
 
 
+
 resource keyVault1 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
     name:'pfeIacKv' 
 
