@@ -57,10 +57,10 @@ jobs:
       - name: Get VM IP address
       
         run: |
-          az vm list-ip-addresses --resource-group pfeIacRg1 --name chabbouhTestVm
-          avminfo=$(az vm list-ip-addresses --resource-group pfeIacRg1 --name chabbouhTestVm --query "[0].virtualMachine.network.publicIpAddresses[0].ipAddress" --output tsv)
+          az vm list-ip-addresses --resource-group pfeIacRg1 --name waelTestVm
+          avminfo=$(az vm list-ip-addresses --resource-group pfeIacRg1 --name waelTestVm --query "[0].virtualMachine.network.publicIpAddresses[0].ipAddress" --output tsv)
           echo "VM IP address: $avminfo"
-          username=$(az vm show --resource-group pfeIacRg1 --name chabbouhTestVm --query 'osProfile.adminUsername' --output tsv)
+          username=$(az vm show --resource-group pfeIacRg1 --name waelTestVm --query 'osProfile.adminUsername' --output tsv)
           echo "VM username: $username"
           echo "padressPublic=$avminfo" >> $GITHUB_ENV
           echo "puserName=$username" >> $GITHUB_ENV
@@ -68,9 +68,9 @@ jobs:
         
       - name: Open ports on VM
         run: |
-          az network nsg rule create --resource-group pfeIacRg1 --nsg-name chabbouhNSG --name SSH --protocol Tcp --direction Inbound --priority 100 --destination-port-ranges 22
-          az network nsg rule create --resource-group pfeIacRg1 --nsg-name chabbouhNSG --name HTTP --protocol Tcp --direction Inbound --priority 101 --destination-port-ranges 80
-          az network nsg rule create --resource-group pfeIacRg1 --nsg-name chabbouhNSG --name HTTPS --protocol Tcp --direction Inbound --priority 102 --destination-port-ranges 443
+          az network nsg rule create --resource-group pfeIacRg1 --nsg-name waelNSG --name SSH --protocol Tcp --direction Inbound --priority 100 --destination-port-ranges 22
+          az network nsg rule create --resource-group pfeIacRg1 --nsg-name waelNSG --name HTTP --protocol Tcp --direction Inbound --priority 101 --destination-port-ranges 80
+          az network nsg rule create --resource-group pfeIacRg1 --nsg-name waelNSG --name HTTPS --protocol Tcp --direction Inbound --priority 102 --destination-port-ranges 443
  
 
       - name: SSH to VM
